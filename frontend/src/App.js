@@ -3,6 +3,8 @@ import LoginPage from "./components/Login.jsx";
 import Signup from "./components/Signup.jsx";
 import StudentDashboard from "./components/Student-dashboard.jsx";
 import InstitutionDashboard from "./components/Institution-dashboard.jsx";
+import IssueCertificate from "./components/IssueCertificate.jsx";
+import VerifyCertificate from "./components/VerifyCertificate.jsx";
 import "./App.css";
 import logo from "./logo.svg";
 
@@ -39,6 +41,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/institution-dashboard" element={<InstitutionDashboard />} />
+        <Route path="/issue-certificate" element={<IssueCertificate />} />
+        <Route path="/verify/:tokenId" element={<VerifyCertificate />} />
 
       </Routes>
   

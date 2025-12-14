@@ -6,7 +6,10 @@ const Student = require("../config/models/Student");
 const User = require("../config/models/User"); // <- needed to find user by email
 const authMiddleware = require("../middleware/auth"); // JWT parser
 
+
 const router = express.Router();
+const mintCertificateNFT = require("../blockchain/mintCertificateNFT.cjs");
+
 
 router.post("/", authMiddleware, async (req, res) => {
   try {
@@ -27,6 +30,17 @@ router.post("/", authMiddleware, async (req, res) => {
       studentEmailSnapshot: studentEmail,
       institutionNameSnapshot: institution.name,
     });
+
+    // 🔗 Mint NFT on blockchain
+    const tokenId = await mintCertificateNFT({
+      subject,
+      studentName,
+      studentEmail,
+      certificateId: cert._id.toString(),
+    });
+
+    cert.blockchainTokenId = tokenId;
+    await cert.save();
 
     return res.status(201).json({
       message: "Certificate created successfully",

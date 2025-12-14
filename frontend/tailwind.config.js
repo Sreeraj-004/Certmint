@@ -8,6 +8,9 @@ module.exports = {
           fontFamily: {
             poppins: ['Poppins', 'sans-serif'],
             forum: ['Forum', 'cursive'],
+            gothic: ["UnifrakturCook", "serif"],
+            kosugi: ["Kosugi Maru", "sans-serif"],
+            devnagari: ["Tiro Devanagari Hindi", "serif"],
           }
         },
       },

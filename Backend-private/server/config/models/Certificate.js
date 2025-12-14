@@ -55,6 +55,10 @@ const certificateSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    // blockchain NFT token ID (Ethereum)
+    blockchainTokenId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
