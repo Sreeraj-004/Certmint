@@ -29,6 +29,33 @@ code {
     'Courier New', monospace;
 }
 
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #374151; /* gray-700 */
+  background-color: #111827; /* gray-900 */
+  color: #f9fafb; /* gray-50 */
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.input-field::placeholder {
+  color: #9ca3af; /* gray-400 */
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #2563eb; /* blue-600 */
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+  background-color: #020617; /* darker focus */
+}
+
+.input-field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ================================
    COMPONENT LAYER
 ================================ */
