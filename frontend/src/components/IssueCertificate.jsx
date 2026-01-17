@@ -124,7 +124,7 @@ export default function IssueCertificate() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               className="input-field"
-              placeholder="Certificate Subject (e.g. Python Developer)"
+              placeholder="Certificate Subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               required

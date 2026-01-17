@@ -1,63 +1,18 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const router = express.Router();
+
 const Certificate = require("../config/models/Certificate");
 const Institution = require("../config/models/Institution");
 const Student = require("../config/models/Student");
-const User = require("../config/models/User"); // <- needed to find user by email
-const authMiddleware = require("../middleware/auth"); // JWT parser
+const authMiddleware = require("../middleware/auth");
 
-
-const router = express.Router();
-const mintCertificateNFT = require("../blockchain/mintCertificateNFT.cjs");
-
-
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    const { subject, studentName, studentEmail } = req.body;
-    const userId = req.user.userId; // institution's userId
-
-    // find institution
-    const institution = await Institution.findOne({ userId });
-    if (!institution) {
-      return res.status(400).json({ message: "Institution profile not found" });
-    }
-
-    // create the certificate directly (no student lookup)
-    const cert = await Certificate.create({
-      institution: institution._id,
-      subject,
-      studentNameSnapshot: studentName,
-      studentEmailSnapshot: studentEmail,
-      institutionNameSnapshot: institution.name,
-    });
-
-    // 🔗 Mint NFT on blockchain
-    const tokenId = await mintCertificateNFT({
-      subject,
-      studentName,
-      studentEmail,
-      certificateId: cert._id.toString(),
-    });
-
-    cert.blockchainTokenId = tokenId;
-    await cert.save();
-
-    return res.status(201).json({
-      message: "Certificate created successfully",
-      certificate: cert,
-    });
-
-  } catch (err) {
-    console.error("Create cert error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
+/* ===============================
+   GET certificates (institution)
+================================ */
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    // Find institution for this user
     const institution = await Institution.findOne({ userId });
     if (!institution) {
       return res.status(404).json({ message: "Institution not found" });
@@ -65,9 +20,7 @@ router.get("/", authMiddleware, async (req, res) => {
 
     const certificates = await Certificate.find({
       institution: institution._id,
-    })
-      .sort({ dateOfIssue: -1 })
-      .lean();
+    }).sort({ dateOfIssue: -1 }).lean();
 
     res.json({
       certificates: certificates.map(c => ({
@@ -77,7 +30,6 @@ router.get("/", authMiddleware, async (req, res) => {
         studentEmailSnapshot: c.studentEmailSnapshot,
         institutionNameSnapshot: c.institutionNameSnapshot,
         dateOfIssue: c.dateOfIssue,
-        certificateCode: c.certificateCode,
         blockchainTokenId: c.blockchainTokenId,
       })),
     });
@@ -87,19 +39,21 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
+/* ===============================
+   GET certificates (student)
+================================ */
 router.get("/student", authMiddleware, async (req, res) => {
   try {
-    const userEmail = req.user.email; // 👈 from JWT
+    const userId = req.user.userId;
 
-    if (!userEmail) {
-      return res.status(400).json({ message: "Email not found in token" });
+    const student = await Student.findOne({ userId });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
     }
 
     const certificates = await Certificate.find({
-      studentEmailSnapshot: userEmail,
-    })
-      .sort({ dateOfIssue: -1 })
-      .lean();
+      student: student._id,
+    }).sort({ dateOfIssue: -1 }).lean();
 
     res.json({
       certificates: certificates.map(c => ({
@@ -118,8 +72,9 @@ router.get("/student", authMiddleware, async (req, res) => {
   }
 });
 
-
-
+/* ===============================
+   GET single certificate
+================================ */
 router.get("/:id", async (req, res) => {
   try {
     const cert = await Certificate.findById(req.params.id).lean();
@@ -142,6 +97,5 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 module.exports = router;

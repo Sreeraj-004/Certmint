@@ -1,3 +1,12 @@
+(await wallet.getBalance()).toString()
+wallet.address
+const wallet = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+const provider = new providers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+const { Wallet, providers } = require("ethers");
+.exit
+wallet.address
+const wallet = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, provider);
+const { Wallet, providers } = require("ethers");
 .exit
 await cert.isInstitutionApproved(owner.address);
 await tx.wait();

@@ -80,7 +80,7 @@ const SignupPage = () => {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your full name"
+                  placeholder="Name"
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg 
                              focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 
                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
@@ -97,7 +97,7 @@ const SignupPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
+                  placeholder="Email"
                   className="bg-gray-50 border border-gray-300 text-white rounded-lg 
                              focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 
                              dark:bg-gray-700 dark:border-gray-600"
@@ -113,7 +113,7 @@ const SignupPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="password"
                   className="bg-gray-50 border border-gray-300 text-white rounded-lg 
                              focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 
                              dark:bg-gray-700 dark:border-gray-600"

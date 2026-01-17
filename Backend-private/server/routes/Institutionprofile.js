@@ -5,8 +5,10 @@ const Institution = require("../config/models/Institution");
 const Student = require("../config/models/Student");
 const User = require("../config/models/User");
 const authMiddleware = require("../middleware/auth"); 
-
+const uploadInstitutionLogo = require("../middleware/uploadInstitutionLogo");
 const router = express.Router();
+
+
 
 router.get("/", authMiddleware, async (req, res) => {
   try {
@@ -100,6 +102,7 @@ router.get("/", authMiddleware, async (req, res) => {
         address: institution.address,
         contactNumber: institution.contactNumber,
         locationUrl: institution.locationUrl,
+        logoUrl: institution.logoUrl,
       },
       stats: {
         totalCertificates,
@@ -115,5 +118,86 @@ router.get("/", authMiddleware, async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const institution = await Institution.findOne({ userId });
+    if (!institution) {
+      return res.status(404).json({ message: "Institution not found" });
+    }
+
+    res.json(institution);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post(
+  "/create",
+  authMiddleware,
+  uploadInstitutionLogo.single("logo"),
+  async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const { name, contactNumber, locationUrl, address } = req.body;
+
+      if (!name) {
+        return res
+          .status(400)
+          .json({ message: "Institution name is required" });
+      }
+
+      // 🔹 Convert address object/string → string
+      let addressString = "";
+      if (address) {
+        const parsedAddress =
+          typeof address === "string" ? JSON.parse(address) : address;
+
+        const { line1, district, state, pincode } = parsedAddress;
+        addressString = `${line1}, ${district}, ${state}${
+          pincode ? " - " + pincode : ""
+        }`;
+      }
+
+      // 🔹 Logo (DP) handling
+      let logoUrl = null;
+      if (req.file) {
+        logoUrl = `/uploads/institutions/${req.file.filename}`;
+      }
+
+      const institution = await Institution.findOneAndUpdate(
+        { userId },
+        {
+          userId,
+          name,
+          contactNumber,
+          locationUrl,
+          address: addressString,
+          ...(logoUrl && { logoUrl }),
+        },
+        {
+          new: true,
+          upsert: true,
+          runValidators: true,
+        }
+      );
+
+      res.json({
+        message: "Institution profile saved",
+        institution,
+      });
+    } catch (err) {
+      console.error("Institution create error:", err);
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
+
+
+
 
 module.exports = router;
